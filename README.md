@@ -2,6 +2,13 @@
 
 GraphQL server in Node.js using Express, MongoDB and Mongoose.
 
+## Running with Docker
+You can use `docker-compose up` to  run an instance of GraphQL-MongoDB Server and MongoDB locally.
+
+```bash
+docker-compose up
+```
+
 ## Requirements
 
 * [Node.js](http://nodejs.org/)

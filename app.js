@@ -9,11 +9,12 @@ var app = express();
 // GraphqQL server route
 app.use('/graphql', graphqlHTTP(req => ({
   schema,
-  pretty: true
+  pretty: true,
+  graphiql: true
 })));
 
 // Connect mongo database
-mongoose.connect('mongodb://localhost/graphql');
+mongoose.connect('mongodb://mongo/graphql');
 
 // start server
 var server = app.listen(8080, () => {
