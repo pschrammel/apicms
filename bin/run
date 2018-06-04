@@ -1,0 +1,18 @@
+#!/bin/bash
+
+mode=${1:-static}
+
+if [ $mode == "dev" ]; then
+  if [ ! -d ./node_modules ]; then
+    yarn install
+  fi
+  # This file needs to be copied to /app or /admin in dev-mode
+  envsubst < "/code/index.env.html" | tee > "/code/index.html" &&
+  # https://github.com/webpack/watchpack/issues/25
+  touch -d "10 seconds ago" "/code/index.html" &&
+  exec yarn dev
+  # --offline dev
+else
+  envsubst < "/usr/share/nginx/html/index.env.html" | tee > "/usr/share/nginx/html/index.html" &&
+  exec nginx -g "daemon off;"
+fi

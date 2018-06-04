@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+require 'erb'
+require 'json'
+
+def run(command, exit_on_error=true)
+  puts "running: #{command}"
+  system(command, out: $stdout, err: :out)
+  exit_status=$?.exitstatus
+  if exit_status.nonzero? && exit_on_error
+    exit(exit_status)
+  end
+  exit_status
+end
+
+if ENV["INSIDE_CONTAINER"] == "true" then
+  #puts 'setting up test and running rspec'
+  #sleep 5 #wait for postgresql to start
+  #run('rake db:create --trace')
+  #run('rake db:migrate --trace')
+  #run('rake db:seed_fu --trace')
+  #run("rspec --colour --tty #{ARGV.join(' ')}")
+  exit(0)
+end
+
+@project_name = 'metoda_apps_frontend'
+build_tag= ENV["BUILD_NUMBER"] || Time.now.strftime("%Y%m%d%H%M")
+
+cache_tag_code = "git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1 2>/dev/null` 2>/dev/null"
+cache_tag = `#{cache_tag_code}`
+
+unless $?.exitstatus == 0
+  cache_tag = "latest"
+end
+cache_tag = false unless ENV["BUILD_ID"]
+
+volumes = []
+
+volumes << "..:/code" unless ENV["BUILD_ID"]
+
+@tag = build_tag
+@cache_tag = cache_tag
+@volumes = volumes
+
+# Run docker pull on cache
+if @cache_tag
+  run("docker pull 858049876441.dkr.ecr.eu-west-1.amazonaws.com/#{@project_name}:#{@cache_tag}")
+end
+
+erb = ERB.new(File.open("#{__dir__}/../spec/docker-compose.yml").read, 0, '>')
+File.write("#{__dir__}/../spec/docker-compose.run.yml", erb.result)
+puts File.read("#{__dir__}/../spec/docker-compose.run.yml")
+run("sudo docker-compose -f #{__dir__}/../spec/docker-compose.run.yml build")
+exit_status=run("sudo docker-compose -f #{__dir__}/../spec/docker-compose.run.yml run --rm -e 'INSIDE_CONTAINER=true' tester bin/test #{ARGV.join(' ')}", false)
+run("sudo docker-compose -f #{__dir__}/../spec/docker-compose.run.yml down --remove-orphans") unless ENV["KEEP_SPEC_CONTAINERS"]
+exit(exit_status)

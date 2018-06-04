@@ -8,6 +8,7 @@
     "url": "https://github.com/bruno12mota/graphql-nodejs"
   },
   "scripts": {
+    "dev": "nodemon index.js",
     "start": "node index.js"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
     "express": "^4.13.3",
     "express-graphql": "^0.4.5",
     "graphql": "^0.4.14",
-    "mongoose": "^4.3.5"
+    "mongoose": "^4.3.5",
+    "nodemon": "^1.17.5"
   }
 }

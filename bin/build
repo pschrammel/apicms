@@ -1,0 +1,32 @@
+#!/bin/bash
+tag=`date +%Y%m%d%H%M`
+app_dir=`pwd`
+prj_file="$app_dir/project.json"
+
+# repo=`jq -r ".repo" $app_dir/project.json"`
+repo=`jq -r ".docker.repo" "$prj_file"`
+project=`jq -r ".docker.name" "$prj_file"`
+
+
+ACTION=${1:-build}
+
+# TODO: only if aws
+
+if [ "$ACTION" == "build" ]; then
+  `aws ecr get-login --region eu-west-1 --no-include-email`
+  docker build -t $repo/$project:latest $app_dir
+fi
+
+if [ "$ACTION" == "push" ]; then
+  `aws ecr get-login --region eu-west-1 --no-include-email`
+  docker build -t $repo/$project:latest $app_dir
+  docker push $repo/$project:latest
+  docker tag $repo/$project:latest $repo/$project:$tag
+  docker push $repo/$project:$tag
+  echo "Pushed $project, Tag: $tag"
+fi
+
+if [ "$ACTION" == "release" ]; then
+  metoda tag -m "release"
+fi
+  

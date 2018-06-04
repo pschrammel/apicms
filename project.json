@@ -1,0 +1,10 @@
+{
+  "project": "apicms",
+    
+  "git": "github.com/preisanalytics/apicms",
+  "path": "apicms",
+  "docker": {
+    "repo": "858049876441.dkr.ecr.eu-west-1.amazonaws.com",
+    "name": "apicms"
+  }
+}
