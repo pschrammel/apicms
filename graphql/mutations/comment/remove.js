@@ -15,8 +15,8 @@ export default {
       type: new GraphQLNonNull(GraphQLID)
     }
   },
-  async resolve (root, params, options) {
-    const projection = getProjection(options.fieldASTs[0]);
+  async resolve (root, params, ctx, options) {
+    const projection = getProjection(options.fieldNodes[0]);
     const removedComment = await CommentModel
       .findByIdAndRemove(params._id, {
         select: projection

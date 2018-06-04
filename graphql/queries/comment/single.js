@@ -18,17 +18,17 @@ export default {
       type: new GraphQLNonNull(GraphQLID)
     }
   },
-  resolve (root, params, options) {
-    const projection = getProjection(options.fieldASTs[0]);
-      var query= CommentModel
-          .populate('postId')
-          .findById(params.id)
-          .select(projection);
-      var results = query.exec(function(error, data) {
-          console.log(JSON.stringify(data, null, "\t"))
-      });
-      console.warn("comment/single:", params.id);
-      return results;
+    resolve (root, params, ctx, options) {
+        //console.log("comment/single:", Object.keys(ctx),Object.keys(options))
+        console.log(options.fieldNodes)
+        const projection = getProjection(options.fieldNodes[0]);
+        console.log(projection)
+        var query= CommentModel
+            //.populate('postId')
+            .findById(params.id)
+            .select(projection);
+        console.warn("comment/single:", params.id);
+        return query.exec();
   }
 };
 
