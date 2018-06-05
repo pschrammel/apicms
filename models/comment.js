@@ -13,4 +13,10 @@ var commentSchema = new mongoose.Schema({
   }
 });
 
+commentSchema.virtual('post',{
+    ref: 'BlogPost',
+    localField: 'postId',
+    foreignField: '_id',
+    justOne: true
+})
 export default mongoose.model('Comment', commentSchema);
